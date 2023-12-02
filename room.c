@@ -8,6 +8,7 @@ RoomType* createRoom(char* roomName) {
     initEvidenceList(&newRoom->evidences);
     initHunterArray(&newRoom->hunterArray);
     newRoom->ghost = NULL;
+    sem_init(&newRoom->mutex, 0, 1);
     return newRoom;
 }
 

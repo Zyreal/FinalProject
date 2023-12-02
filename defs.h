@@ -46,7 +46,7 @@ struct HunterArray {
     int size;
 };
 
-// Hunter struct
+// Hunter struct:  contains a name, room data, type of evidence, and a collection of evidence, fear, and boredom
 struct Hunter {
     char name[MAX_STR];
     RoomType* room;
@@ -54,6 +54,7 @@ struct Hunter {
     EvidenceType *evidenceCollection;
     int fear;
     int boredom;
+    sem_t mutex;
 };
 
 // Linked list of rooms
@@ -80,13 +81,14 @@ struct EvidenceNode {
     struct EvidenceNode *next;
 };
 
-// Room struct
+// Room struct: contains a ghost, a collection of evidence, and an array of Hunters
 struct Room {
     char name[MAX_STR];
     RoomListType rooms;
     EvidenceListType evidences;
     HunterArrayType hunterArray;
     GhostType* ghost;
+    sem_t mutex;
     // struct Ghost* ghosts;
     // struct Hunter* hunters;
 };
@@ -104,6 +106,7 @@ struct Node {
   struct Node *next;
 };
 
+// House struct: contains rooms, an array of Hunters, and a collection of evidence
 struct House{
     HunterArrayType hunterArray;
     RoomListType rooms;
@@ -113,11 +116,13 @@ struct House{
 
 // HOUSE AND ROOM FUNCTIONS
 void initHouse(HouseType *house, EvidenceType *el);
+void initEvidenceList(EvidenceListType* el);
 void populateRooms(HouseType* house);
 RoomType* createRoom(char* roomName);
 void initRoomList(RoomListType *rl);
 void connectRooms(RoomType* room1, RoomType* room2);
 void addRoom(RoomListType* rl, RoomType* room);
+void cleanupHouse(HouseType* house);
 
 
 // GHOST FUNCTIONS
@@ -134,22 +139,18 @@ void initHunter(HunterType** hunter, char* name, EvidenceType et, EvidenceType* 
 void* hunterBehaviour(void* arg);
 void initHunterArray(HunterArrayType* hunterArray);
 void moveHunterToRoom(HunterType* hunter);
+void removeHunter(HunterType* hunter);
 bool reviewEvidence(HunterType* hunter);
 void hunterCollect(HunterType* hunter);
 void printHunters(HunterType* hunters[NUM_HUNTERS]);
 void increaseDebuff(HunterType* hunter);
+
 
 // ROOM FUNCTIONS
 int isRoomConnected(RoomListType roomList); // delete
 int hasHunterInRoom(RoomType* room);
 void leaveEvidence(RoomType* room, enum EvidenceType evidenceType);
 void deleteRoom(RoomType* room);
-
-// Exiting a thread if the hunter's fear or boredom is too high
-// void hunterExits(struct Hunter* hunter);
-
-
-void initEvidenceList(EvidenceListType* el);
 
 
 

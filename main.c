@@ -30,8 +30,6 @@ int main()
     }
     initGhost(randomGhost(), n->room, &ghost);
     l_ghostInit(ghost->ghostType, n->room->name);
-    // pthread_create(&g, NULL, ghostBehaviour, ghost);
-    // pthread_join(g, NULL);
 
     // initGhost(randomGhost(), (&(&house)->rooms)->head->next->room, &ghost);
     // l_ghostInit(ghost->ghostType, (&(&house)->rooms)->head->next->room->name);
@@ -45,20 +43,24 @@ int main()
     // TESTING HUNTERS
     char hunterName[MAX_STR];
     HunterType* hunters[NUM_HUNTERS];
-    
+
     for (int i = 0; i < NUM_HUNTERS; i++){
         printf("\nEnter name of Hunter %d: ", i+1);
         scanf("%s", hunterName);
         l_hunterInit(hunterName, i);
         initHunter(&hunters[i], hunterName, i, (&house)->evidenceCollection, (&(&house)->rooms)->head->room); 
     }
+
     // printf("\n");
     // printHunters(hunters);
 
     // moveHunterToRoom(hunters[0]);
     // printf("%s\n",hunters[0]->room->name);
-
-    // moveHunterToRoom(hunters[1]);
+    // RoomType* r = hunters[0]->room;
+    // printf("hunters in room: %d", (&r->hunterArray)->size);
+    // moveHunterToRoom(hunters[0]);
+    // printf("hunters in room after: %d", (&r->hunterArray)->size);
+    // // moveHunterToRoom(hunters[1]);
     // printf("%s\n",hunters[1]->room->name);
         
     // moveHunterToRoom(hunters[2]);
@@ -84,8 +86,23 @@ int main()
     //     printf("hunter 4: %d\n",hunters[3]->evidenceCollection[q]);
     // }
 
+    // if(sem_init(&hunters[0]->room->mutex, 0, 1) < 0){
+    //     printf("Error: on semaphore init\n");
+    //     exit(1);
+    // }
+
+    pthread_create(&g, NULL, ghostBehaviour, ghost);
     pthread_create(&h1, NULL, hunterBehaviour, hunters[0]);
+    pthread_create(&h2, NULL, hunterBehaviour, hunters[1]);
+    pthread_create(&h3, NULL, hunterBehaviour, hunters[2]);
+    pthread_create(&h4, NULL, hunterBehaviour, hunters[3]);
+
+    pthread_join(g, NULL);
     pthread_join(h1, NULL);
+    pthread_join(h2, NULL);
+    pthread_join(h3, NULL);
+    pthread_join(h4, NULL);
+
 
     return 0;
 }
@@ -97,6 +114,7 @@ void* ghostBehaviour(void* arg) {
     int action;
 
     while (ghost->boredom < BOREDOM_MAX){
+        printf("g bore %d in room: %s of %d hunters\n", ghost->boredom, ghost->room->name, (&ghost->room->hunterArray)->size);
         if (ghost->room->hunterArray.size > 0){
             // generate a random action for ghosts when hunters are present
             action = randInt(0, 2);
@@ -147,17 +165,20 @@ void* hunterBehaviour(void* arg) {
         }
         usleep(HUNTER_WAIT);
     }
+    printf("now exiting thread");
+    removeHunter(hunter);
+
     // if the hunter's boredom is above 100, they will exit
-    if (hunter->boredom > BOREDOM_MAX) {
-        printf("The Ghost has won!\n\n");
+    if (hunter->boredom >=BOREDOM_MAX) {
         l_hunterExit(hunter->name, LOG_BORED);
+        printf("\n\nThe Ghost has won!\n\n");
     }
     // if the hunter's fear is above 100, they will exit
-    else if (hunter->fear > FEAR_MAX) {
-        printf("The Ghost has won!\n\n");
+    else if (hunter->fear >= FEAR_MAX) {
         l_hunterExit(hunter->name, LOG_FEAR);
+        printf("\n\nThe Ghost has won!\n\n");
     }
-
+    
     // Exiting the thread
     pthread_exit(NULL);
 }

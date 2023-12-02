@@ -73,3 +73,15 @@ void initHouse(HouseType *house, EvidenceType* el) {
     initRoomList(&house->rooms);
     house->evidenceCollection = el;
 }
+
+// Cleaning up the rooms
+void cleanupRoom(RoomType* Room){
+
+}
+
+// Cleaning up the houses
+void cleanupHouse(HouseType* house) {
+    
+
+
+}

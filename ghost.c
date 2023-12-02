@@ -1,6 +1,5 @@
 #include "defs.h"
 
-// Ghost contains room data
 
 void initGhost(GhostClass ghostType, RoomType* room, GhostType** gt) {
     GhostType* newGhost = malloc(sizeof(GhostType));
@@ -11,13 +10,13 @@ void initGhost(GhostClass ghostType, RoomType* room, GhostType** gt) {
 }
 
 
-
 // random evidence is before function called, maybe just pass in ghost
 void leaveEvidence(RoomType* room, enum EvidenceType evidenceType){
     EvidenceNodeType* newEvidenceNode = (EvidenceNodeType*)malloc(sizeof(EvidenceNodeType));
     newEvidenceNode->evidenceType = evidenceType;
     newEvidenceNode->next = NULL;
 
+    sem_wait(&room->mutex);
     if(room->evidences.head == NULL) {
         room->evidences.head = newEvidenceNode;
         room->evidences.tail = newEvidenceNode;
@@ -27,6 +26,7 @@ void leaveEvidence(RoomType* room, enum EvidenceType evidenceType){
     }
 
     room->evidences.size++;
+    sem_post(&room->mutex);
     l_ghostEvidence(evidenceType, room->name);
 }
 
@@ -41,36 +41,14 @@ void ghostMove(GhostType* ghost) {
         newRoom = newRoom->next;
     }
 
+    sem_wait(&ghost->room->mutex);
     // change pointer of ghost in rooms
     ghost->room->ghost = NULL;
     newRoom->room->ghost = ghost;
+    sem_post(&ghost->room->mutex);
 
     ghost->room = newRoom->room;
     l_ghostMove(newRoom->room->name);
-}
-
-// void ghostExits(struct Ghost* ghost) {
-//     // If the ghost's boredom is too high, exit the thread
-//     if (ghost->boredom >= BOREDOM_MAX) {
-//         printf("%s", LOG_BORED);
-//         pthread_exit(NULL);
-//     }
-// }
-
-const char* ghostClassToString(enum GhostClass ghostType) {
-    switch (ghostType) {
-        case POLTERGEIST:
-            return "Poltergeist";
-        case BANSHEE:
-            return "Banshee";
-        case BULLIES:
-            return "Bullies";
-        case PHANTOM:
-            return "Phantom";
-        case GH_UNKNOWN:
-        default:
-            return "Unknown Ghost";
-    }
 }
 
 // void printGhosts(GhostType* ghosts, int numGhosts) {
