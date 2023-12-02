@@ -3,18 +3,18 @@
 // Hunter contains the room data
 
 // initialize hunter
-void initHunter(HunterType** hunter, char* name, EvidenceType et, int* ec, RoomType* room) {
-    *hunter = (HunterType*)malloc(sizeof(HunterType));
-    strcpy((*hunter)->name,name);
+void initHunter(HunterType** hunter, char* name, EvidenceType et, EvidenceType* ec, RoomType* room) {
+    HunterType* newHunter = malloc(sizeof(HunterType));
 
+    strcpy(newHunter->name, name);
     // change to van room
-    (*hunter)->room = room;
-
-    (*hunter)->evidenceType = et;
+    newHunter->room = room;
+    newHunter->evidenceType = et;
     // pointing to collection?
-    (*(*hunter)->evidenceCollection) = *ec;
-    (*hunter)->fear = 0;
-    (*hunter)->boredom = 0;
+    newHunter->evidenceCollection = ec;
+    newHunter->fear = 0;
+    newHunter->boredom = 0;
+    (*hunter) = newHunter;
 }
 
 void initHunterArray(HunterArrayType* hunterArray) {
@@ -109,12 +109,12 @@ void hunterCollect(HunterType* hunter) {
 
     }
 
-    // display something else for unable to find
+    // display something else for being unable to find evidence
     l_hunterCollect(hunter->name, EV_UNKNOWN, hunter->room->name);
 }
 
 // Prints the names of the hunters in the list along with their boredom and fear level
-void printHunters(HunterType *hunters[NUM_HUNTERS]) {
+void printHunters(HunterType* hunters[NUM_HUNTERS]) {
     for (int i = 0; i < NUM_HUNTERS; ++i) {
         printf("Hunter %d: %s | Fear: %d | Boredom: %d\n", i + 1, hunters[i]->name, hunters[i]->fear, hunters[i]->boredom);
     }

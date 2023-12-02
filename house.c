@@ -69,7 +69,7 @@ void populateRooms(HouseType* house) {
 }
 
 // initializing the house
-void initHouse(HouseType *house, EvidenceListType* el) {
+void initHouse(HouseType *house, EvidenceType* el) {
     initHunterArray(&house->hunterArray);
     initRoomList(&house->rooms);
     house->evidenceCollection = el;

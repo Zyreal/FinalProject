@@ -49,7 +49,7 @@ struct Hunter {
     char name[MAX_STR];
     RoomType* room;
     EvidenceType evidenceType;
-    int *evidenceCollection;
+    EvidenceType *evidenceCollection;
     int fear;
     int boredom;
 };
@@ -103,10 +103,10 @@ struct Node {
 struct House{
     HunterArrayType hunterArray;
     RoomListType rooms;
-    int *evidenceCollection;
+    EvidenceType *evidenceCollection;
 };
 
-void initHouse(HouseType *house, EvidenceListType *el);
+void initHouse(HouseType *house, EvidenceType *el);
 void populateRooms(HouseType* house);
 
 // Initializing rooms
@@ -127,7 +127,7 @@ void leaveEvidence(RoomType* room, enum EvidenceType evidenceType);
 
 
 // Function to initialize hunter
-void initHunter(HunterType** hunter, char* name, EvidenceType et, int* ec, RoomType* room);
+void initHunter(HunterType** hunter, char* name, EvidenceType et, EvidenceType* ec, RoomType* room);
 void initHunterArray(HunterArrayType* hunterArray);
 
 // Function to add a hunter to a room
@@ -149,9 +149,8 @@ void ghostExits(struct Ghost* ghost);
 void hunterCollect(HunterType* hunter);
 
 
-void printHunters(HunterType *hunters[NUM_HUNTERS]);
+void printHunters(HunterType* hunters[NUM_HUNTERS]);
 void printGhosts(GhostType* ghost, int numGhosts);
-void printMenu(int *choice);
 
 void deleteRoom(RoomType* room);
 
