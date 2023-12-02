@@ -11,42 +11,6 @@ void initGhost(GhostClass ghostType, RoomType* room, GhostType** gt) {
 }
 
 
-// void* ghostBehaviour(void* arg) {
-
-//     GhostType* ghost = (GhostType*)arg;
-
-//     while (ghost->boredom < BOREDOM_MAX){
-//         if (ghost->room->hunters.size > 0){
-//             ghost->boredom = 0;
-//             int action = randInt(0, 2);
-
-//             if (action == 0) {
-//                 enum EvidenceType evidenceType = randomGhostEvidence();
-//                 l_ghostEvidence(evidenceType, ghost->room->name);
-//                 addEvidenceToRoom(&ghost->room->evidences, evidenceType);
-//             }
-            
-//         } else {
-//             ghost->boredom++;
-
-//             int action = randInt(0, 3);
-
-//             if (action == 0) {
-//                 moveGhostToAdjacentRoom(ghost);
-//             } else if (action == 1) {
-//                 enum EvidenceType evidenceType = randomGhostEvidence();
-//                 l_ghostEvidence(evidenceType, ghost->room->name);
-//                 addEvidenceToRoom(&ghost->room->evidences, evidenceType);
-//             }
-//             // For action == 2, don't do anything
-//         }
-
-//         usleep(GHOST_WAIT * 1000);
-//     }
-
-//     // Exiting the thread
-//     pthread_exit(NULL);
-// }
 
 // random evidence is before function called, maybe just pass in ghost
 void leaveEvidence(RoomType* room, enum EvidenceType evidenceType){
@@ -126,3 +90,31 @@ const char* ghostClassToString(enum GhostClass ghostType) {
 //         printf("\n");
 //     }
 // }
+
+EvidenceType randomGhostEvidence(GhostType* ghost) {
+    // magic num
+    int i = randInt(0, 3);
+    EvidenceType e[3];
+    if (ghost->ghostType == POLTERGEIST) {
+        e[0] = EMF;
+        e[1] = TEMPERATURE;
+        e[2] = FINGERPRINTS;
+    }
+    else if (ghost->ghostType == BANSHEE) {
+        e[0] = EMF;
+        e[1] = TEMPERATURE;
+        e[2] = SOUND;
+    }
+    else if (ghost->ghostType == BULLIES) {
+        e[0] = EMF;
+        e[1] = FINGERPRINTS;
+        e[2] = SOUND;
+    }
+    else if (ghost->ghostType == PHANTOM) {
+        e[0] = TEMPERATURE;
+        e[1] = FINGERPRINTS;
+        e[2] = SOUND;
+    }
+    return e[i];
+
+}

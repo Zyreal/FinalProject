@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <pthread.h>
 #include <semaphore.h>
+#include <stdbool.h>
 #include <time.h>
 
 #define MAX_STR         64
@@ -39,6 +40,7 @@ typedef struct House        HouseType;
 
 const char* ghostClassToString(enum GhostClass ghostType);
 
+// Array of hunters
 struct HunterArray {
     HunterType* hunters[NUM_HUNTERS];
     int size;
@@ -54,12 +56,14 @@ struct Hunter {
     int boredom;
 };
 
+// Linked list of rooms
 struct RoomList {
     RoomNodeType* head;
     RoomNodeType* tail;
     int size;
 };
 
+// Each room node 
 struct RoomNode {
     RoomType *room;
     RoomNodeType *next;
@@ -106,56 +110,46 @@ struct House{
     EvidenceType *evidenceCollection;
 };
 
+
+// HOUSE AND ROOM FUNCTIONS
 void initHouse(HouseType *house, EvidenceType *el);
 void populateRooms(HouseType* house);
-
-// Initializing rooms
 RoomType* createRoom(char* roomName);
 void initRoomList(RoomListType *rl);
-
-// Connecting and adding rooms
 void connectRooms(RoomType* room1, RoomType* room2);
 void addRoom(RoomListType* rl, RoomType* room);
 
-// Ghost behaviours
+
+// GHOST FUNCTIONS
+void initGhost(GhostClass ghostType, RoomType* room, GhostType** gt);
 void* ghostBehaviour(void* arg);
 void ghostMove(GhostType* ghost);
+void ghostExits(struct Ghost* ghost);
+EvidenceType randomGhostEvidence(GhostType* ghost);
+void printGhosts(GhostType* ghost, int numGhosts);
 
+
+// HUNTER FUNCTIONS
+void initHunter(HunterType** hunter, char* name, EvidenceType et, EvidenceType* ec, RoomType* room);
+void* hunterBehaviour(void* arg);
+void initHunterArray(HunterArrayType* hunterArray);
+void moveHunterToRoom(HunterType* hunter);
+bool reviewEvidence(HunterType* hunter);
+void hunterCollect(HunterType* hunter);
+void printHunters(HunterType* hunters[NUM_HUNTERS]);
+void increaseDebuff(HunterType* hunter);
+
+// ROOM FUNCTIONS
+int isRoomConnected(RoomListType roomList); // delete
 int hasHunterInRoom(RoomType* room);
 void leaveEvidence(RoomType* room, enum EvidenceType evidenceType);
-
-
-
-// Function to initialize hunter
-void initHunter(HunterType** hunter, char* name, EvidenceType et, EvidenceType* ec, RoomType* room);
-void initHunterArray(HunterArrayType* hunterArray);
-
-// Function to add a hunter to a room
-void moveHunterToRoom(HunterType* hunter);
-
-// Reviewing hunter evidence
-void reviewEvidence(HunterType* hunter);
+void deleteRoom(RoomType* room);
 
 // Exiting a thread if the hunter's fear or boredom is too high
 // void hunterExits(struct Hunter* hunter);
 
 
-void initGhost(GhostClass ghostType, RoomType* room, GhostType** gt);
-
-// Exiting a thread if the ghost's boredom is too high
-void ghostExits(struct Ghost* ghost);
-
-// Allows the hunter to collect evidence
-void hunterCollect(HunterType* hunter);
-
-
-void printHunters(HunterType* hunters[NUM_HUNTERS]);
-void printGhosts(GhostType* ghost, int numGhosts);
-
-void deleteRoom(RoomType* room);
-
 void initEvidenceList(EvidenceListType* el);
-int isRoomConnected(RoomListType roomList);
 
 
 
@@ -176,5 +170,3 @@ void l_ghostInit(enum GhostClass type, char* room);
 void l_ghostMove(char* room);
 void l_ghostEvidence(enum EvidenceType evidence, char* room);
 void l_ghostExit(enum LoggerDetails reason);
-
-int isRoomConnected(RoomListType roomList);

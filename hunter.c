@@ -17,6 +17,7 @@ void initHunter(HunterType** hunter, char* name, EvidenceType et, EvidenceType* 
     (*hunter) = newHunter;
 }
 
+// initializing the hunter array
 void initHunterArray(HunterArrayType* hunterArray) {
     hunterArray->size = 0;
 }
@@ -24,7 +25,7 @@ void initHunterArray(HunterArrayType* hunterArray) {
 // chooses a random room to move the hunter
 void moveHunterToRoom(HunterType* hunter) {
     int chooseRoom = randInt(1, (&hunter->room->rooms)->size);
-    printf("%d, %d", chooseRoom, (&hunter->room->rooms)->size);
+    // printf("%d, %d", chooseRoom, (&hunter->room->rooms)->size);
     RoomNodeType *newRoom = (&hunter->room->rooms)->head;
     int i;
     while (chooseRoom > 1) {
@@ -51,6 +52,7 @@ void moveHunterToRoom(HunterType* hunter) {
 
     // // change room of hunter
     hunter->room = newRoom->room;
+    l_hunterMove(hunter->name, newRoom->room->name);
 }
 
 // Checks if there is a hunter in the room
@@ -60,7 +62,7 @@ int hasHunterInRoom(RoomType* room) {
 
 // checks if hunters have enough evidence to leave
 // change parameter to shared evidence from house
-void reviewEvidence(HunterType* hunter) {
+bool reviewEvidence(HunterType* hunter) {
     int totalEvidence = 0;
     for (int i = 0; i < NUM_HUNTERS; i++) {
         // need to initialize array to start at ev_unknown
@@ -70,9 +72,11 @@ void reviewEvidence(HunterType* hunter) {
     }
     if (totalEvidence >= 3) {
         l_hunterReview(hunter->name, LOG_SUFFICIENT);
+        return true;
     }
     else {
         l_hunterReview(hunter->name, LOG_INSUFFICIENT);
+        return false;
     }
 }
 
@@ -99,7 +103,7 @@ void hunterCollect(HunterType* hunter) {
     while (currEvidence != NULL) {
         printf("has %d, for %d", hunter->evidenceType, currEvidence->evidenceType);
         if (hunter->evidenceType == currEvidence->evidenceType) {
-            hunter->evidenceCollection[hunter->evidenceType] = EV_COUNT;
+            hunter->evidenceCollection[hunter->evidenceType] = hunter->evidenceType;
             l_hunterCollect(hunter->name, hunter->evidenceType, hunter->room->name);
             return;
         }
@@ -110,12 +114,21 @@ void hunterCollect(HunterType* hunter) {
     }
 
     // display something else for being unable to find evidence
-    l_hunterCollect(hunter->name, EV_UNKNOWN, hunter->room->name);
+    // l_hunterCollect(hunter->name, EV_UNKNOWN, hunter->room->name);
 }
 
 // Prints the names of the hunters in the list along with their boredom and fear level
 void printHunters(HunterType* hunters[NUM_HUNTERS]) {
     for (int i = 0; i < NUM_HUNTERS; ++i) {
         printf("Hunter %d: %s | Fear: %d | Boredom: %d\n", i + 1, hunters[i]->name, hunters[i]->fear, hunters[i]->boredom);
+    }
+}
+
+void increaseDebuff(HunterType* hunter) {
+    if (hunter->room->ghost != NULL) {
+        hunter->fear++;
+    }
+    else {
+        hunter->boredom++;
     }
 }

@@ -11,7 +11,6 @@ void populateRooms(HouseType* house) {
     // createRoom assumes that we dynamically allocate a room, initializes the values, and returns a RoomType*
     // create functions are pretty typical, but it means errors are harder to return aside from NULL
     struct Room* van                = createRoom("Van");
-    printf("%d\n", (&van->rooms)->size);
     struct Room* hallway            = createRoom("Hallway");
     struct Room* master_bedroom     = createRoom("Master Bedroom");
     struct Room* boys_bedroom       = createRoom("Boy's Bedroom");
