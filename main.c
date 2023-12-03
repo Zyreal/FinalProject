@@ -5,22 +5,18 @@ int main()
     // Initialize the random number generator
     srand(time(NULL));
     pthread_t g, h1, h2, h3, h4;
-    /* Note: You may change it, but it's here for demonstration purposes
-        This code will not compile until you have implemented the house functions and structures
-        HouseType house;
-        initHouse(&house);
-        populateRooms(&house);
-    */
 
+    // create collection to store evidences
     EvidenceType el[] = {EV_UNKNOWN, EV_UNKNOWN, EV_UNKNOWN, EV_UNKNOWN};
-    // TESTING ROOMS
+    
+    // Initialize ROOMS
     HouseType house;
     initHouse(&house, el);
     populateRooms(&house);
 
 
 
-    // TESTING GHOSTS
+    // Initialize GHOSTS
     GhostType* ghost;
     int rand = randInt(0, (&(&house)->rooms)->size);
     RoomNodeType *n = (&(&house)->rooms)->head;
@@ -31,66 +27,19 @@ int main()
     initGhost(randomGhost(), n->room, &ghost);
     l_ghostInit(ghost->ghostType, n->room->name);
 
-    // initGhost(randomGhost(), (&(&house)->rooms)->head->next->room, &ghost);
-    // l_ghostInit(ghost->ghostType, (&(&house)->rooms)->head->next->room->name);
-
-    // if (pthread_create(&g, NULL, ghostbehaviour(), ghost) != 0){
-    //     fprintf(stderr, "Error creating ghost thread");
-    //     return 1;
-    // }
-
-
-    // TESTING HUNTERS
+    // Initialize HUNTERS
     char hunterName[MAX_STR];
     HunterType* hunters[NUM_HUNTERS];
-
+    
+    // Asking the user to enter the names of four hunters
     for (int i = 0; i < NUM_HUNTERS; i++){
         printf("\nEnter name of Hunter %d: ", i+1);
         scanf("%s", hunterName);
         l_hunterInit(hunterName, i);
-        initHunter(&hunters[i], hunterName, i, (&house)->evidenceCollection, (&(&house)->rooms)->head->room); 
+        initHunter(house->hunterArray->hunters[i], hunterName, i, (&house)->evidenceCollection, (&(&house)->rooms)->head->room); 
     }
-
-    // printf("\n");
-    // printHunters(hunters);
-
-    // moveHunterToRoom(hunters[0]);
-    // printf("%s\n",hunters[0]->room->name);
-    // RoomType* r = hunters[0]->room;
-    // printf("hunters in room: %d", (&r->hunterArray)->size);
-    // moveHunterToRoom(hunters[0]);
-    // printf("hunters in room after: %d", (&r->hunterArray)->size);
-    // // moveHunterToRoom(hunters[1]);
-    // printf("%s\n",hunters[1]->room->name);
-        
-    // moveHunterToRoom(hunters[2]);
-    // printf("%s\n",hunters[2]->room->name);
-        
-    // moveHunterToRoom(hunters[3]);
-    // printf("%s\n",hunters[3]->room->name);
-  
-    // leaveEvidence(ghost->room, 0);
-    // ghostMove(ghost);
-
-    // for (int z = 0; z < NUM_HUNTERS; z++) {
-    //     hunterCollect(hunters[z]);
-    //     printf("\n");
-    // }
-
-    // // testing if evidence is shared
-    // for(int q = 0; q < NUM_HUNTERS; q++) {
-    //     printf("%d\nhouse: %d\n",q, house.evidenceCollection[q]);
-    //     printf("hunter 1: %d\n",hunters[0]->evidenceCollection[q]);
-    //     printf("hunter 2: %d\n",hunters[1]->evidenceCollection[q]);
-    //     printf("hunter 3: %d\n",hunters[2]->evidenceCollection[q]);
-    //     printf("hunter 4: %d\n",hunters[3]->evidenceCollection[q]);
-    // }
-
-    // if(sem_init(&hunters[0]->room->mutex, 0, 1) < 0){
-    //     printf("Error: on semaphore init\n");
-    //     exit(1);
-    // }
-
+    
+    // Creating a ghost thread, and 4 hunter threads
     pthread_create(&g, NULL, ghostBehaviour, ghost);
     pthread_create(&h1, NULL, hunterBehaviour, hunters[0]);
     pthread_create(&h2, NULL, hunterBehaviour, hunters[1]);
@@ -103,7 +52,14 @@ int main()
     pthread_join(h3, NULL);
     pthread_join(h4, NULL);
 
-
+    // Cleaning up the house and freeing the 4 hunters
+    cleanupHouse(&house);
+    free(hunters[0]);
+    free(hunters[1]);
+    free(hunters[2]);
+    free(hunters[3]);
+    free(ghost);
+    
     return 0;
 }
 

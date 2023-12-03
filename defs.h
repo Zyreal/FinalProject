@@ -98,7 +98,7 @@ struct Ghost {
     int boredom;
 };
 
-// Room node: contains pointer to the next n
+// Room node: contains pointer to the next node
 struct Node {
   struct Room *room;
   struct Node *next;

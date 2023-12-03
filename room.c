@@ -12,6 +12,7 @@ RoomType* createRoom(char* roomName) {
     return newRoom;
 }
 
+
 // initialize room list
 void initRoomList(RoomListType* rl) {
     // may need to malloc
@@ -19,6 +20,7 @@ void initRoomList(RoomListType* rl) {
     rl->head = NULL;
     rl->tail = NULL;
 }
+
 
 // connect 2 rooms together
 void connectRooms(RoomType* room1, RoomType* room2) {
@@ -30,6 +32,7 @@ void connectRooms(RoomType* room1, RoomType* room2) {
     addRoom((&room2->rooms), room1);
 }
 
+
 int isRoomConnected(RoomListType roomList){
     RoomNodeType* currRoom = (&roomList)->head;
 
@@ -40,9 +43,6 @@ int isRoomConnected(RoomListType roomList){
 
     return 0;
 }
-
-
-
 
 
 // connects 1 room to the room list of another room
@@ -63,12 +63,27 @@ void addRoom(RoomListType* rl, RoomType* room) {
     rl->size++;
 }
 
-void initEvidenceList(EvidenceListType* el) {
-    el->head = NULL;
-    el->tail = NULL;
-    el->size = 0;
+// Cleaning up the rooms
+void cleanupRoom(RoomType* room) {
+    cleanupEvidence(&room->evidences);
+    RoomNodeType *head = (&room->rooms)->head;
+    RoomNodeType *temp;
+    while (head != NULL) {
+        temp = head;
+        head = head->next;
+        free(temp);
+    }
 }
 
-void deleteRoom(RoomType* room){
-    free(room);
+// Cleaning the list of rooms
+void cleanupRoomList(RoomListType *rl) {
+    RoomNodeType *head = rl->head;
+    RoomNodeType *temp;
+    while (head != NULL) {
+        temp = head;
+        head = head->next;
+        cleanupRoom(temp->room);
+        free(temp->room);
+        free(temp);
+    }
 }

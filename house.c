@@ -67,21 +67,25 @@ void populateRooms(HouseType* house) {
     // }
 }
 
-// initializing the house
+// Initializing the house
 void initHouse(HouseType *house, EvidenceType* el) {
     initHunterArray(&house->hunterArray);
     initRoomList(&house->rooms);
     house->evidenceCollection = el;
 }
 
-// Cleaning up the rooms
-void cleanupRoom(RoomType* Room){
 
+
+// Cleaning up the array of hunters
+void cleanupHunterArray(HunterArrayType* hunterArray) {
+    int i;
+    for (i = 0; i < hunterArray->size; i++) {
+        free(hunterArray->hunters[i]);
+    }
 }
 
 // Cleaning up the houses
 void cleanupHouse(HouseType* house) {
-    
-
-
+    // cleanupHunterArray(&house->hunterArray);
+    cleanupRoomList(&house->rooms);
 }
