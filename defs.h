@@ -89,8 +89,6 @@ struct Room {
     HunterArrayType hunterArray;
     GhostType* ghost;
     sem_t mutex;
-    // struct Ghost* ghosts;
-    // struct Hunter* hunters;
 };
 
 // Ghost struct
@@ -98,9 +96,9 @@ struct Ghost {
     enum GhostClass ghostType;
     RoomType *room;
     int boredom;
-    // struct Ghost* next;
 };
 
+// Room node: contains pointer to the next n
 struct Node {
   struct Room *room;
   struct Node *next;
@@ -117,6 +115,7 @@ struct House{
 // HOUSE AND ROOM FUNCTIONS
 void initHouse(HouseType *house, EvidenceType *el);
 void initEvidenceList(EvidenceListType* el);
+void cleanupEvidence(EvidenceListType* el);
 void populateRooms(HouseType* house);
 RoomType* createRoom(char* roomName);
 void initRoomList(RoomListType *rl);
@@ -144,14 +143,15 @@ bool reviewEvidence(HunterType* hunter);
 void hunterCollect(HunterType* hunter);
 void printHunters(HunterType* hunters[NUM_HUNTERS]);
 void increaseDebuff(HunterType* hunter);
+void cleanupHunterArray(HunterArrayType* hunterArray);
 
 
 // ROOM FUNCTIONS
 int isRoomConnected(RoomListType roomList); // delete
 int hasHunterInRoom(RoomType* room);
 void leaveEvidence(RoomType* room, enum EvidenceType evidenceType);
-void deleteRoom(RoomType* room);
-
+void cleanupRoom(RoomType* room);
+void cleanupRoomList(RoomListType *rl);
 
 
 // Helper Utilities
