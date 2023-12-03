@@ -31,7 +31,6 @@ typedef struct RoomList     RoomListType;
 typedef struct Room         RoomType;
 typedef struct RoomNode     RoomNodeType;
 typedef struct EvidenceList EvidenceListType;
-// typedef struct Evidence     EvidenceType;
 typedef struct EvidenceNode EvidenceNodeType;
 typedef struct Hunter       HunterType;
 typedef struct HunterArray  HunterArrayType;
@@ -144,6 +143,7 @@ void hunterCollect(HunterType* hunter);
 void printHunters(HunterType* hunters[NUM_HUNTERS]);
 void increaseDebuff(HunterType* hunter);
 void cleanupHunterArray(HunterArrayType* hunterArray);
+void cleanupHunter(HunterType* hunter);
 
 
 // ROOM FUNCTIONS

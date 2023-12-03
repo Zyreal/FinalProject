@@ -11,10 +11,9 @@ void initHunter(HunterType** hunter, char* name, EvidenceType et, EvidenceType* 
     newHunter->room = room;
     (&newHunter->room->hunterArray)->hunters[(&newHunter->room->hunterArray)->size] = newHunter;
     (&newHunter->room->hunterArray)->size++;
-    printf("%d", (&newHunter->room->hunterArray)->size);
+    // printf("%d", (&newHunter->room->hunterArray)->size);
 
     newHunter->evidenceType = et;
-    // pointing to collection?
     newHunter->evidenceCollection = ec;
     newHunter->fear = 0;
     newHunter->boredom = 0;

@@ -29,22 +29,42 @@ int main()
 
     // Initialize HUNTERS
     char hunterName[MAX_STR];
-    HunterType* hunters[NUM_HUNTERS];
+    // HunterType* hunters[NUM_HUNTERS];
     
-    // Asking the user to enter the names of four hunters
+    // Asking the user to enter the names of 4 hunters
     for (int i = 0; i < NUM_HUNTERS; i++){
         printf("\nEnter name of Hunter %d: ", i+1);
         scanf("%s", hunterName);
         l_hunterInit(hunterName, i);
-        initHunter(house->hunterArray->hunters[i], hunterName, i, (&house)->evidenceCollection, (&(&house)->rooms)->head->room); 
+        // initHunter(&hunters[i], hunterName, i, (&house)->evidenceCollection, (&(&house)->rooms)->head->room); 
+        initHunter(& (&(&house)->hunterArray)->hunters[i], hunterName, i, (&house)->evidenceCollection, (&(&house)->rooms)->head->room); 
+        (&(&house)->hunterArray)->size++;
     }
-    
+    // (&(&house)->hunterArray)->hunters = hunters;
+
+
     // Creating a ghost thread, and 4 hunter threads
     pthread_create(&g, NULL, ghostBehaviour, ghost);
-    pthread_create(&h1, NULL, hunterBehaviour, hunters[0]);
-    pthread_create(&h2, NULL, hunterBehaviour, hunters[1]);
-    pthread_create(&h3, NULL, hunterBehaviour, hunters[2]);
-    pthread_create(&h4, NULL, hunterBehaviour, hunters[3]);
+
+
+        // printf("%s", (&(&house)->hunterArray)->hunters[0]->name);
+
+    // for (int j = 0; j < (&(&house)->hunterArray)->size; j++) {
+    //     printf("%s ", (&(&house)->hunterArray)->hunters[j]->name);
+    
+    // //     pthread_create(&h1, NULL, hunterBehaviour, (&(&house)->hunterArray)->hunters[j]);
+    // }
+
+        pthread_create(&h1, NULL, hunterBehaviour, (&(&house)->hunterArray)->hunters[0]);
+        pthread_create(&h2, NULL, hunterBehaviour, (&(&house)->hunterArray)->hunters[1]);
+        pthread_create(&h3, NULL, hunterBehaviour, (&(&house)->hunterArray)->hunters[2]);
+        pthread_create(&h4, NULL, hunterBehaviour, (&(&house)->hunterArray)->hunters[3]);
+
+
+    // pthread_create(&h2, NULL, hunterBehaviour, hunters[0]);
+    // pthread_create(&h2, NULL, hunterBehaviour, hunters[1]);
+    // pthread_create(&h3, NULL, hunterBehaviour, hunters[2]);
+    // pthread_create(&h4, NULL, hunterBehaviour, hunters[3]);
 
     pthread_join(g, NULL);
     pthread_join(h1, NULL);
@@ -54,10 +74,17 @@ int main()
 
     // Cleaning up the house and freeing the 4 hunters
     cleanupHouse(&house);
-    free(hunters[0]);
-    free(hunters[1]);
-    free(hunters[2]);
-    free(hunters[3]);
+    // free(hunters[0]);
+    // free(hunters[1]);
+    // free(hunters[2]);
+    // free(hunters[3]);
+
+    // free((&(&house)->hunterArray)->hunters[0]);
+    // free((&(&house)->hunterArray)->hunters[1]);
+    // free((&(&house)->hunterArray)->hunters[2]);
+    // free((&(&house)->hunterArray)->hunters[3]);
+
+
     free(ghost);
     
     return 0;

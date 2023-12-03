@@ -1,4 +1,4 @@
-TARGETS = fp ghosts.o main.o room.o logger.o utils.o hunter.o house.o evidence.o
+TARGETS = fp ghost.o main.o room.o logger.o utils.o hunter.o house.o evidence.o
 
 all:	ghost.c hunter.c logger.c main.c room.c utils.c house.c evidence.c defs.h
 	gcc -Wall -Wextra -c ghost.c
