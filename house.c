@@ -27,8 +27,6 @@ void populateRooms(HouseType* house) {
     // This adds each room to each other's room lists
     // All rooms are two-way connections
     connectRooms(van, hallway);
-    // printf("%d\n", (&van->rooms)->size);
-
     connectRooms(hallway, master_bedroom);
     connectRooms(hallway, boys_bedroom);
     connectRooms(hallway, bathroom);
@@ -43,8 +41,6 @@ void populateRooms(HouseType* house) {
 
     // Add each room to the house's room list
     addRoom(&house->rooms, van);
-    // printf("%d\n", (&van->rooms)->size);
-
     addRoom(&house->rooms, hallway);
     addRoom(&house->rooms, master_bedroom);
     addRoom(&house->rooms, boys_bedroom);
@@ -57,36 +53,27 @@ void populateRooms(HouseType* house) {
     addRoom(&house->rooms, living_room);
     addRoom(&house->rooms, garage);
     addRoom(&house->rooms, utility_room);
-
-    // RoomNodeType* new = (&house->rooms)->head;
-    // while (new != NULL) {
-    //     printf("%s: ", new->room->name);
-    //     isRoomConnected(new->room->rooms);
-    //     printf("\n");
-    //     new = new->next;
-    // }
 }
 
-// Initializing the house
+/*
+  Function: Initialize House
+  Purpose:  Initialize all fields of a HouseType variable
+  Params:
+      Input: EvidenceType* el - shared evidence collection to be stored
+      Input/Output: HouseType *house - HouseType to be initialized
+*/
 void initHouse(HouseType *house, EvidenceType* el) {
     initHunterArray(&house->hunterArray);
     initRoomList(&house->rooms);
     house->evidenceCollection = el;
 }
 
-void cleanupHunter(HunterType* hunter) {
-    free(hunter);
-}
-
-// Cleaning up the array of hunters
-void cleanupHunterArray(HunterArrayType* hunterArray) {
-    int i;
-    for (i = 0; i < hunterArray->size; i++) {
-        cleanupHunter(hunterArray->hunters[i]);
-    }
-}
-
-// Cleaning up the houses
+/*
+  Function: Cleanup House
+  Purpose:  Frees all allocated data of a HouseType
+  Params:
+      Input: HouseType* house - HouseType to be freed
+*/
 void cleanupHouse(HouseType* house) {
     cleanupHunterArray(&house->hunterArray);
     cleanupRoomList(&house->rooms);

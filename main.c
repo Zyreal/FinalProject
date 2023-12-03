@@ -9,12 +9,10 @@ int main()
     // create collection to store evidences
     EvidenceType el[] = {EV_UNKNOWN, EV_UNKNOWN, EV_UNKNOWN, EV_UNKNOWN};
     
-    // Initialize ROOMS
+    // Initialize HOUSE and ROOMS
     HouseType house;
     initHouse(&house, el);
     populateRooms(&house);
-
-
 
     // Initialize GHOSTS
     GhostType* ghost;
@@ -29,139 +27,92 @@ int main()
 
     // Initialize HUNTERS
     char hunterName[MAX_STR];
-    // HunterType* hunters[NUM_HUNTERS];
-    
     // Asking the user to enter the names of 4 hunters
     for (int i = 0; i < NUM_HUNTERS; i++){
         printf("\nEnter name of Hunter %d: ", i+1);
         scanf("%s", hunterName);
         l_hunterInit(hunterName, i);
-        // initHunter(&hunters[i], hunterName, i, (&house)->evidenceCollection, (&(&house)->rooms)->head->room); 
-        initHunter(& (&(&house)->hunterArray)->hunters[i], hunterName, i, (&house)->evidenceCollection, (&(&house)->rooms)->head->room); 
+        initHunter(&(&(&house)->hunterArray)->hunters[i], hunterName, i, (&house)->evidenceCollection, (&(&house)->rooms)->head->room); 
         (&(&house)->hunterArray)->size++;
     }
-    // (&(&house)->hunterArray)->hunters = hunters;
 
 
     // Creating a ghost thread, and 4 hunter threads
     pthread_create(&g, NULL, ghostBehaviour, ghost);
+    pthread_create(&h1, NULL, hunterBehaviour, (&(&house)->hunterArray)->hunters[0]);
+    pthread_create(&h2, NULL, hunterBehaviour, (&(&house)->hunterArray)->hunters[1]);
+    pthread_create(&h3, NULL, hunterBehaviour, (&(&house)->hunterArray)->hunters[2]);
+    pthread_create(&h4, NULL, hunterBehaviour, (&(&house)->hunterArray)->hunters[3]);
 
 
-        // printf("%s", (&(&house)->hunterArray)->hunters[0]->name);
-
-    // for (int j = 0; j < (&(&house)->hunterArray)->size; j++) {
-    //     printf("%s ", (&(&house)->hunterArray)->hunters[j]->name);
-    
-    // //     pthread_create(&h1, NULL, hunterBehaviour, (&(&house)->hunterArray)->hunters[j]);
-    // }
-
-        pthread_create(&h1, NULL, hunterBehaviour, (&(&house)->hunterArray)->hunters[0]);
-        pthread_create(&h2, NULL, hunterBehaviour, (&(&house)->hunterArray)->hunters[1]);
-        pthread_create(&h3, NULL, hunterBehaviour, (&(&house)->hunterArray)->hunters[2]);
-        pthread_create(&h4, NULL, hunterBehaviour, (&(&house)->hunterArray)->hunters[3]);
-
-
-    // pthread_create(&h2, NULL, hunterBehaviour, hunters[0]);
-    // pthread_create(&h2, NULL, hunterBehaviour, hunters[1]);
-    // pthread_create(&h3, NULL, hunterBehaviour, hunters[2]);
-    // pthread_create(&h4, NULL, hunterBehaviour, hunters[3]);
-
+    // join threads back
     pthread_join(g, NULL);
     pthread_join(h1, NULL);
     pthread_join(h2, NULL);
     pthread_join(h3, NULL);
     pthread_join(h4, NULL);
 
-    // Cleaning up the house and freeing the 4 hunters
+
+    // print results of ghost hunt
+    printResults(&house, ghost);
+
+
+    // Cleaning up the house with the hunters and ghost
     cleanupHouse(&house);
-    // free(hunters[0]);
-    // free(hunters[1]);
-    // free(hunters[2]);
-    // free(hunters[3]);
-
-    // free((&(&house)->hunterArray)->hunters[0]);
-    // free((&(&house)->hunterArray)->hunters[1]);
-    // free((&(&house)->hunterArray)->hunters[2]);
-    // free((&(&house)->hunterArray)->hunters[3]);
-
-
     free(ghost);
-    
+
     return 0;
 }
 
+/*
+  Function: Print Results
+  Purpose:  Prints final results of program
+  Params:
+      Input: HouseType* house - HouseType to check its hunters
+      Input: GhostType* ghost - GhostType to check its fields
+*/
+void printResults(HouseType* house, GhostType* ghost) {
+    printf("========================================\n");
+    printf("All done. Let's tally the results...\n");
+    printf("========================================\n");
 
-void* ghostBehaviour(void* arg) {
-
-    GhostType* ghost = (GhostType*)arg;
-    int action;
-
-    while (ghost->boredom < BOREDOM_MAX){
-        printf("g bore %d in room: %s of %d hunters\n", ghost->boredom, ghost->room->name, (&ghost->room->hunterArray)->size);
-        if (ghost->room->hunterArray.size > 0){
-            // generate a random action for ghosts when hunters are present
-            action = randInt(0, 2);
-            ghost->boredom = 0;
-        } else {
-            // generate a random action for ghosts when no hunters are present
-            action = randInt(0, 3);
-            ghost->boredom++;
+        for (int i = 0; i < (&(house)->hunterArray)->size; i++) {
+            checkHunterStatus((&(house)->hunterArray)->hunters[i]);
         }
-        
-        if (action == 1) {
-            EvidenceType evidenceType = randomGhostEvidence(ghost);
-            // printf("leaving %d\n", evidenceType);
-            leaveEvidence(ghost->room, evidenceType);
-        } else if (action == 2) {
-            ghostMove(ghost);
-        } 
+    printf("----------------------------------------\n");
 
-        usleep(GHOST_WAIT);
+    // check if hunters have correct amount of evidence
+    int evidenceNum = 0;
+    for (int j = 0; j < NUM_HUNTERS; j++) {
+        if (house->evidenceCollection[j] != EV_UNKNOWN) {
+            evidenceNum++;
+        }
     }
 
-    l_ghostExit(LOG_BORED);
-    
-    // Exiting the thread
-    pthread_exit(NULL);
-}
+    char ghost_str[MAX_STR];
+    if (evidenceNum >= 3) {
+        printf("It seems the ghost has been discovered!\n");
+        printf("The hunters have won the game!\n");
+        ghostToString(ghost->ghostType, ghost_str);
 
 
-
-void* hunterBehaviour(void* arg) {
-    HunterType* hunter = (HunterType*) arg;
-    int action;
-    while (hunter->boredom <= BOREDOM_MAX && hunter->fear <= FEAR_MAX ) {
-        increaseDebuff(hunter);
-        action = randInt(0, 3);
-        if (action == 0) {
-            moveHunterToRoom(hunter);
-        }
-        else if (action == 1) {
-            hunterCollect(hunter);
-        }
-        else if (action == 2) {
-            bool hasEvidence = reviewEvidence(hunter);
-            if (hasEvidence == true) {
-                l_hunterExit(hunter->name, LOG_EVIDENCE);
-                break;
-            }
-        }
-        usleep(HUNTER_WAIT);
+        printf("Using the evidence they found, they correctly determined that the ghost is a %s\n", ghost_str);
     }
-    printf("now exiting thread");
-    removeHunter(hunter);
+    else {
+        printf("The hunters failed!\n");
+        ghostToString(GH_UNKNOWN, ghost_str);
+        printf("Using the evidence they found, they incorrectly determined that the ghost is a %s\n", ghost_str);
+        ghostToString(ghost->ghostType, ghost_str);
+        printf("The ghost is actually a %s\n", ghost_str);
+    }
 
-    // if the hunter's boredom is above 100, they will exit
-    if (hunter->boredom >=BOREDOM_MAX) {
-        l_hunterExit(hunter->name, LOG_BORED);
-        printf("\n\nThe Ghost has won!\n\n");
+
+    printf("The hunters collected the following evidence\n");
+    for (int j = 0; j < NUM_HUNTERS; j++) {
+        if (house->evidenceCollection[j] != EV_UNKNOWN) {
+            char ev_str[MAX_STR];
+            evidenceToString(house->evidenceCollection[j], ev_str);
+            printf("    *%s\n", ev_str);
+        }
     }
-    // if the hunter's fear is above 100, they will exit
-    else if (hunter->fear >= FEAR_MAX) {
-        l_hunterExit(hunter->name, LOG_FEAR);
-        printf("\n\nThe Ghost has won!\n\n");
-    }
-    
-    // Exiting the thread
-    pthread_exit(NULL);
 }

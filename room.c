@@ -1,6 +1,12 @@
 #include "defs.h"
 
-// initialize room
+/*
+  Function: Create Room
+  Purpose:  Initializes a RoomType
+  Params:
+      Input: char* roomName - name of the RoomType
+  Return: RoomType* - pointer of newly initialized RoomType
+*/
 RoomType* createRoom(char* roomName) {
     RoomType* newRoom = (RoomType*) malloc(sizeof(RoomType));
     strcpy(newRoom->name, roomName);
@@ -13,16 +19,26 @@ RoomType* createRoom(char* roomName) {
 }
 
 
-// initialize room list
+/*
+  Function: Initialize RoomList
+  Purpose:  Initializes a RoomList
+  Params:
+      Output: RoomListType* rl - RoomListType to be initialized
+*/
 void initRoomList(RoomListType* rl) {
-    // may need to malloc
     rl->size = 0;
     rl->head = NULL;
     rl->tail = NULL;
 }
 
 
-// connect 2 rooms together
+/*
+  Function: Connect Rooms
+  Purpose:  Connects 2 rooms together by their RoomList
+  Params:
+      Input: RoomType* room1 - first room to be connected
+      Input: RoomType* room2 - second room to be connected
+*/
 void connectRooms(RoomType* room1, RoomType* room2) {
 
     // connecting room1 to room2
@@ -32,20 +48,13 @@ void connectRooms(RoomType* room1, RoomType* room2) {
     addRoom((&room2->rooms), room1);
 }
 
-
-int isRoomConnected(RoomListType roomList){
-    RoomNodeType* currRoom = (&roomList)->head;
-
-    while (currRoom != NULL){
-        printf("%s ", currRoom->room->name);
-        currRoom = currRoom->next;
-    }
-
-    return 0;
-}
-
-
-// connects 1 room to the room list of another room
+/*
+  Function: Add Room
+  Purpose:  Adds a RoomType to a RoomListType
+  Params:
+      Input: RoomType* room - RoomType to be added
+      Output: RoomListType* rl - RoomListType to store RoomType
+*/
 void addRoom(RoomListType* rl, RoomType* room) {
     RoomNodeType* newNode = (RoomNodeType*) malloc(sizeof(RoomNodeType));
 
@@ -63,7 +72,12 @@ void addRoom(RoomListType* rl, RoomType* room) {
     rl->size++;
 }
 
-// Cleaning up the rooms
+/*
+  Function: Cleanup Room
+  Purpose:  Frees all allocated data of a RoomType
+  Params:
+      Input/Output: RoomType* room - RoomType to be freed
+*/
 void cleanupRoom(RoomType* room) {
     cleanupEvidence(&room->evidences);
     RoomNodeType *head = (&room->rooms)->head;
@@ -75,7 +89,12 @@ void cleanupRoom(RoomType* room) {
     }
 }
 
-// Cleaning the list of rooms
+/*
+  Function: Cleanup RoomList
+  Purpose:  Frees all allocated data of a RoomListType
+  Params:
+      Input/Output: RoomListType* rl - RoomListType to be freed
+*/
 void cleanupRoomList(RoomListType *rl) {
     RoomNodeType *head = rl->head;
     RoomNodeType *temp;

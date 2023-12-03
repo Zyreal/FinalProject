@@ -110,27 +110,32 @@ struct House{
     EvidenceType *evidenceCollection;
 };
 
+// MAIN FUNCTIONS
+void printResults(HouseType* house, GhostType* ghost);
 
-// HOUSE AND ROOM FUNCTIONS
+// HOUSE FUNCTIONS
 void initHouse(HouseType *house, EvidenceType *el);
-void initEvidenceList(EvidenceListType* el);
-void cleanupEvidence(EvidenceListType* el);
 void populateRooms(HouseType* house);
+void cleanupHouse(HouseType* house);
+
+// ROOM FUNCTIONS
 RoomType* createRoom(char* roomName);
 void initRoomList(RoomListType *rl);
 void connectRooms(RoomType* room1, RoomType* room2);
 void addRoom(RoomListType* rl, RoomType* room);
-void cleanupHouse(HouseType* house);
+void cleanupRoom(RoomType* room);
+void cleanupRoomList(RoomListType *rl);
 
+// EVIDENCE FUNCTIONS
+void initEvidenceList(EvidenceListType* el);
+void cleanupEvidence(EvidenceListType* el);
 
 // GHOST FUNCTIONS
 void initGhost(GhostClass ghostType, RoomType* room, GhostType** gt);
-void* ghostBehaviour(void* arg);
+void leaveEvidence(RoomType* room, enum EvidenceType evidenceType);
 void ghostMove(GhostType* ghost);
-void ghostExits(struct Ghost* ghost);
 EvidenceType randomGhostEvidence(GhostType* ghost);
-void printGhosts(GhostType* ghost, int numGhosts);
-
+void* ghostBehaviour(void* arg);
 
 // HUNTER FUNCTIONS
 void initHunter(HunterType** hunter, char* name, EvidenceType et, EvidenceType* ec, RoomType* room);
@@ -140,18 +145,10 @@ void moveHunterToRoom(HunterType* hunter);
 void removeHunter(HunterType* hunter);
 bool reviewEvidence(HunterType* hunter);
 void hunterCollect(HunterType* hunter);
-void printHunters(HunterType* hunters[NUM_HUNTERS]);
 void increaseDebuff(HunterType* hunter);
+void checkHunterStatus(HunterType* hunter);
 void cleanupHunterArray(HunterArrayType* hunterArray);
 void cleanupHunter(HunterType* hunter);
-
-
-// ROOM FUNCTIONS
-int isRoomConnected(RoomListType roomList); // delete
-int hasHunterInRoom(RoomType* room);
-void leaveEvidence(RoomType* room, enum EvidenceType evidenceType);
-void cleanupRoom(RoomType* room);
-void cleanupRoomList(RoomListType *rl);
 
 
 // Helper Utilities

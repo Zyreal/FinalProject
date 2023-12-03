@@ -1,6 +1,13 @@
 #include "defs.h"
 
-
+/*
+  Function: Initialize Ghost
+  Purpose:  Frees all allocated data of a GhostType
+  Params:
+      Input: GhostClass ghostType - GhostClass of the GhostType
+      Input: RoomType* room - RoomType that the ghost starts in
+      Input/Output: GhostType** gt - GhostType to be initialized
+*/
 void initGhost(GhostClass ghostType, RoomType* room, GhostType** gt) {
     GhostType* newGhost = malloc(sizeof(GhostType));
     newGhost->ghostType = ghostType;
@@ -10,7 +17,13 @@ void initGhost(GhostClass ghostType, RoomType* room, GhostType** gt) {
 }
 
 
-// random evidence is before function called, maybe just pass in ghost
+/*
+  Function: Leave Evidence
+  Purpose: Leaves evidence stored in a GhostType
+  Params:
+      Input: enum EvidenceType evidenceType - EvidenceType to be left
+      Input/Output: RoomType* room - RoomType that will hold the EvidenceType
+*/
 void leaveEvidence(RoomType* room, enum EvidenceType evidenceType){
     EvidenceNodeType* newEvidenceNode = (EvidenceNodeType*)malloc(sizeof(EvidenceNodeType));
     newEvidenceNode->evidenceType = evidenceType;
@@ -30,7 +43,12 @@ void leaveEvidence(RoomType* room, enum EvidenceType evidenceType){
     l_ghostEvidence(evidenceType, room->name);
 }
 
-
+/*
+  Function: Ghost Move
+  Purpose:  Moves the ghost to another connected RoomType
+  Params:
+      Input/Output: GhostType* ghost - GhostType that will be moved
+*/
 void ghostMove(GhostType* ghost) {
     // ghost->room->rooms->size
     int newRoomIndex = randInt(1, (&ghost->room->rooms)->size);
@@ -51,24 +69,13 @@ void ghostMove(GhostType* ghost) {
     l_ghostMove(newRoom->room->name);
 }
 
-// void printGhosts(GhostType* ghosts, int numGhosts) {
-//     printf("\nGHOSTS:\n");
-
-//     for (int i = 0; i < numGhosts; ++i){
-//         printf("Ghost %d:\n", i + 1);
-//         printf("    Ghost Type: %s\n", ghostClassToString(ghosts[i].ghostType));
-        
-//         if (ghosts[i].room != NULL){
-//             printf("    Room: %s\n", ghosts[i].room->name);
-//         } else {
-//             printf("    Room: (null)\n");
-//         }
-
-//         printf("    Boredom: %d\n", ghosts[i].boredom);
-//         printf("\n");
-//     }
-// }
-
+/*
+  Function: Random Ghost Evidence
+  Purpose:  Chooses a random EvidenceType based on the GhostType
+  Params:
+      Input: GhostType* ghost - GhostType whose evidence will be chosen
+  Return: random EvidenceType based on the GhostType
+*/
 EvidenceType randomGhostEvidence(GhostType* ghost) {
     // magic num
     int i = randInt(0, 3);
@@ -95,4 +102,45 @@ EvidenceType randomGhostEvidence(GhostType* ghost) {
     }
     return e[i];
 
+}
+
+/*
+  Function: Ghost Behaviour
+  Purpose:  Loops through all GhostType actions until their boredom reaches max
+  Params:
+      Input: void* arg -  GhostType that is chosen
+  Return: Nothing
+*/
+void* ghostBehaviour(void* arg) {
+
+    GhostType* ghost = (GhostType*)arg;
+    int action;
+
+    while (ghost->boredom < BOREDOM_MAX){
+        // printf("g bore %d in room: %s of %d hunters\n", ghost->boredom, ghost->room->name, (&ghost->room->hunterArray)->size);
+        if (ghost->room->hunterArray.size > 0){
+            // generate a random action for ghosts when hunters are present
+            action = randInt(0, 2);
+            ghost->boredom = 0;
+        } else {
+            // generate a random action for ghosts when no hunters are present
+            action = randInt(0, 3);
+            ghost->boredom++;
+        }
+        
+        if (action == 1) {
+            EvidenceType evidenceType = randomGhostEvidence(ghost);
+            // printf("leaving %d\n", evidenceType);
+            leaveEvidence(ghost->room, evidenceType);
+        } else if (action == 2) {
+            ghostMove(ghost);
+        } 
+
+        usleep(GHOST_WAIT);
+    }
+
+    l_ghostExit(LOG_BORED);
+    
+    // Exiting the thread
+    pthread_exit(NULL);
 }
